@@ -1,4 +1,6 @@
 const Employee = require('../models/Employee')
+const { response } = require('../models/Employee')
+
 
 
 const index = (req, res, next)=>{
@@ -33,10 +35,8 @@ const show = (req, res, next) =>{
 const store = (req, res, next) => {
     let employee = new Employee({
         name:req.body.name,
-        designation: req.body.designation,
         email: req.body.email,
         phone: req.body.phone,
-        age: req.body.age
     })
     employee.save()
     .then(response => {
@@ -53,15 +53,11 @@ const store = (req, res, next) => {
 
 
 const update = (req,res,next) =>{
-    let employeeID = req.body.employeeID
-
-    let updateData ={
+    let employeeId = req.body.employeeId({
         name:req.body.name,
-        designation: req.body.designation,
         email: req.body.email,
         phone: req.body.phone,
-        age: req.body.age
-    }
+    })
     Employee.findByIdAndUpdate(employeeId, {$set: updatedData})
     .then(() =>{
        res.json({
