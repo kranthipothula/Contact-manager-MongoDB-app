@@ -7,6 +7,6 @@ router.get('/', EmployeeController.index)
 router.post('/show', EmployeeController.show)
 router.post('/store', EmployeeController.store)
 router.post('/update', EmployeeController.update)
-//router.post('/destroy', EmployeeController.delete)
+router.post('/delete', EmployeeController.destroy)
 
 module.exports = router

@@ -52,21 +52,25 @@ const store = (req, res, next) => {
 }
 
 
-const update = (req,res,next) =>{
-    let employeeId = req.body.employeeId({
-        name:req.body.name,
+const update = (req, res, next) => {
+    let employeeID = req.body.employeeID
+ 
+    let updatedData = {
+        name: req.body.name,
+        designation: req.body.designation,
         email: req.body.email,
         phone: req.body.phone,
-    })
-    Employee.findByIdAndUpdate(employeeId, {$set: updatedData})
+        age: req.body.age
+    }
+    Employee.findByIdAndUpdate(employeeID,{$set: updatedData})
     .then(() =>{
-       res.json({
-        message: 'Employee updated successfully!'
-       })
+        res.json({
+            message:'Employee updated successfully'
+        })
     })
     .catch(error => {
         res.json({
-            message: 'An error Occured!'
+            message:'an error occured'
         })
     })
 }
