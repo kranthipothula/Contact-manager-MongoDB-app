@@ -3,7 +3,7 @@ const { response } = require('../models/Employee')
 
 
 
-const index = (req, res, next)=>{
+const index = (req, res)=>{
     Employee.find()
     .then(response =>{
         res.json({
@@ -17,7 +17,7 @@ const index = (req, res, next)=>{
     })
 }
 
-const show = (req, res, next) =>{
+const show = (req, res) =>{
     let employeeID = req.body.employeeID
     Employee.findById(employeeID)
     .then(response =>{
@@ -32,27 +32,47 @@ const show = (req, res, next) =>{
     })
 }
 
-const store = (req, res, next) => {
+const store = async (req, res) => {
+    const { name, designation, email, phone, age } = req.body;
+ 
+    // Check for duplicate email
+    const isDuplicateEmail = await checkDuplicateEmail(email);
+    if (isDuplicateEmail) {
+      return res.json({
+        message: 'Email already existed.try new email.'
+      });
+    }
+ 
     let employee = new Employee({
-        name:req.body.name,
-        email: req.body.email,
-        phone: req.body.phone,
-    })
+      name,
+      designation,
+      email,
+      phone,
+      age
+    });
+ 
     employee.save()
-    .then(response => {
+      .then(response => {
         res.json({
-            message: 'Employee Added Successfully!'
-        })
-    })
-    .catch(error => {
+          db: employee,
+          message: 'Employee added successfully'
+        });
+      })
+      .catch(error => {
         res.json({
-            message: 'An error Occured!'
-        })
-    })
-}
+          message: 'An error occurred'
+        });
+      });
+  };
 
+  async function checkDuplicateEmail(email) {
+    const query = { 'email': { $regex: new RegExp(`^${email}$`, 'i') } };
+    const existingEmail = await Employee.findOne(query);
+    return !!existingEmail;
+  }
+ 
 
-const update = (req, res, next) => {
+const update = (req, res) => {
     let employeeID = req.body.employeeID
  
     let updatedData = {
@@ -75,7 +95,7 @@ const update = (req, res, next) => {
     })
 }
 
-const destroy = (req, res, next) => {
+const destroy = (req, res) => {
     let employeeID = req.body.employeeID
     Employee.deleteOne({ _id: employeeID })
     .then(() =>{
@@ -91,9 +111,6 @@ const destroy = (req, res, next) => {
         })
     })
 }
- 
- 
- 
  
 module.exports = {
     index, show, store, update, destroy
