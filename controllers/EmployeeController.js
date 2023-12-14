@@ -71,28 +71,44 @@ const store = async (req, res) => {
     return !!existingEmail;
   }
  
-
-const update = (req, res) => {
-    let employeeID = req.body.employeeID
+  const update = async (req, res) => {
+    try {
+        let employeeID = req.body.employeeID;
  
-    let updatedData = {
-        name: req.body.name,
-        designation: req.body.designation,
-        email: req.body.email,
-        phone: req.body.phone,
-        age: req.body.age
+        // Check for duplicate email
+        const isDuplicateEmail = await checkDuplicateEmail(req.body.email, employeeID);
+        if (isDuplicateEmail) {
+            return res.json({
+                message: 'Duplicate email. Employee not updated.'
+            });
+        }
+ 
+        let updatedData = {
+            name: req.body.name,
+            designation: req.body.designation,
+            email: req.body.email,
+            phone: req.body.phone,
+            age: req.body.age
+        };
+ 
+        await Employee.findByIdAndUpdate(employeeID, { $set: updatedData });
+        res.json({
+            message: 'Employee updated successfully'
+        });
+    } catch (error) {
+        res.json({
+            message: 'An error occurred'
+        });
     }
-    Employee.findByIdAndUpdate(employeeID,{$set: updatedData})
-    .then(() =>{
-        res.json({
-            message:'Employee updated successfully'
-        })
-    })
-    .catch(error => {
-        res.json({
-            message:'an error occured'
-        })
-    })
+};
+
+async function checkDuplicateEmail(email, currentEmployeeID) {
+    const query = {
+        email: { $regex: new RegExp(`^${email}$`, 'i') },
+        _id: { $ne: currentEmployeeID } // Exclude the current employee ID from the check
+    };
+    const existingEmail = await Employee.findOne(query);
+    return !!existingEmail;
 }
 
 const destroy = (req, res) => {
