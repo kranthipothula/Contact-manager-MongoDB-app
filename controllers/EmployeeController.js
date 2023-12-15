@@ -33,7 +33,7 @@ const show = (req, res) =>{
 }
 
 const store = async (req, res) => {
-    const { name, designation, email, phone, age } = req.body;
+    const { name, email, phone } = req.body;
  
     // Check for duplicate email
     const isDuplicateEmail = await checkDuplicateEmail(email);
